@@ -1,13 +1,40 @@
 # UsSpace
 
-A private, mobile-first progressive web app for exactly two people in a long-distance relationship. Both partners share one couple space: statuses, love notes, decisions, date plans, memories, and manually shared map pins stay in sync.
+UsSpace is a private app for exactly two people in a long-distance relationship. It is the shared little space you both open on your phones when you are in different cities: a mood, a note, a plan, a memory, and the days until you are in the same room.
 
-The app lives in this `usspace` folder so it does not replace the other projects in the parent workspace.
+It is a progressive web app. There is no App Store or Play Store. Each person opens the site in the phone browser and can add it to the home screen so it opens full screen, like an installed app. The live site is [usspace-omega.vercel.app](https://usspace-omega.vercel.app).
+
+## What the two of you share
+
+One couple space belongs to two accounts only. The first person creates the space and gets an 8-character invitation code that lasts 30 days. The second person creates their own account and joins with that code. A third person is refused. After that, what either of you writes shows up on the other phone without refreshing.
+
+Each person signs in with email and password. The password is never stored in the database. An optional PIN only locks the app on that phone. Logging out is still available from the lock screen.
+
+You can each choose **English** or **Bahasa Malaysia**. That choice changes your own screen. Your partner can use the other language. Words you type, such as a note or a memory title, stay exactly as written. Built-in labels, such as the date-idea catalog, are translated when they are shown.
+
+Photos are chosen from the phone, not pasted as links. A profile photo can be zoomed and moved before it is saved. The picture is shrunk to a small JPEG and kept in the private database. Firebase Storage is not used.
+
+## The screens
+
+**Home** is the daily check-in. It shows both names, whether the other person is here, how long you have been together, and a countdown to the next meeting. Each person sets a mood, such as missing you or free to call. A short love note left here appears for both of you.
+
+**Together** is for deciding as a pair. This or That is a deck of cards you swipe or tap. When you both like the same card, it becomes a match. Spin the wheel or flip a coin when you cannot choose, and the result is saved for both phones.
+
+**Activities** holds date ideas and a shared checklist. You can add your own idea, take a suggestion, mark one as a favourite, schedule it, and tick it off when it is done.
+
+**Our Map** shows where you each chose to stand. A spot is sent only when someone taps **Ping my spot** and allows location once. UsSpace does not follow either phone in the background. After both spots exist, the page shows the distance between you, and the weather at each pin when it is available.
+
+**Memories** is a scrapbook only the two of you can open. A memory has a title, a date, a few words, and an optional photo from the phone.
+
+**Settings** is where each person edits their own name and photo, picks a colour theme or dark mode, chooses a language, and manages the PIN. Location sharing can be turned off, which also removes that person’s last pin. Either person can log out. Leaving the space and deleting an account are separate, and deleting asks you to type `delete` or `padam`.
+
+## How it stays private
+
+Only the two signed-in members can read the couple space. Invitation codes cannot be listed. Location, notes, votes, plans, and memories are shared with your partner and with no one else. The map uses OpenStreetMap. Weather, when a pin exists, comes from Open-Meteo. Neither service needs an account.
 
 ## Run locally
 
 ```bash
-cd usspace
 npm install
 cp .env.example .env
 npm run dev
@@ -24,7 +51,7 @@ npm run preview
 
 ## Demo mode and Firebase
 
-If `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_DATABASE_URL`, `VITE_FIREBASE_PROJECT_ID`, and `VITE_FIREBASE_APP_ID` are missing, UsSpace stays in **demo mode**. The welcome screen says so.
+If `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_DATABASE_URL`, `VITE_FIREBASE_PROJECT_ID`, and `VITE_FIREBASE_APP_ID` are missing, UsSpace stays in **demo mode**.
 
 Demo mode stores the couple in `localStorage` on that browser and uses a `BroadcastChannel` so two tabs can act as the two partners. Passwords and the optional PIN are hashed with SHA-256 and a salt. They are never stored in plain text. Demo mode does not sync between two phones. Add Firebase when you want that.
 
@@ -43,7 +70,7 @@ Use the free Spark plan. No credit card is required.
 npx firebase-tools deploy --only database --project YOUR_PROJECT_ID
 ```
 
-`firebase.json` already points at `firebase/database.rules.json`. Do not enable Firebase Storage. Photos use an `https` link or a compressed image kept inside the database.
+`firebase.json` already points at `firebase/database.rules.json`. Do not enable Firebase Storage. Photos are chosen from the phone and stored as small JPEG images inside the database.
 
 The web API key is visible in the built JavaScript. That is normal for Firebase web apps. Privacy comes from Authentication plus the database rules, not from hiding the key.
 
@@ -121,7 +148,7 @@ The router is a hash router (`/#/together`), so GitHub Pages and Vercel do not n
 
 ### Vercel
 
-1. Import the repository and set the root directory to `usspace` if the repo contains other projects.
+1. Import this repository. The app is the repository root.
 2. Framework preset: Vite. Build command: `npm run build`. Output: `dist`.
 3. Add the `VITE_FIREBASE_*` variables. Set `VITE_BASE` to `/`.
 4. Deploy. The Spark plan and Vercel hobby plan are enough.
@@ -157,7 +184,7 @@ Settings inside the app repeats these steps. If the connection is gone before th
 6. Spin the wheel and flip the coin. The latest result shows on the other phone.
 7. Add a date idea, check a checklist item, and schedule a virtual date.
 8. On Our Map, each person presses **Ping my spot** and allows location once. Distance appears only after both pins exist. Delete my pin removes only that person’s pin. Turning sharing off removes it too.
-9. Add a memory with a title, date, and either an image link or a small photo.
+9. Add a memory with a title, a date, a few words, and an optional photo from the phone.
 10. Change the meeting date, theme, and dark mode. Confirm the other phone updates.
 11. Set a PIN, reload, unlock, then log out from the lock screen.
 12. Partner B leaves the space. Partner A can then leave or delete the account. Deleting asks you to type `delete`.
@@ -166,7 +193,7 @@ In demo mode, use two tabs in the same browser instead of two phones. Log out be
 
 ## Free-tier limits
 
-- Firebase Spark: email/password auth, 1 GB Realtime Database storage, about 10 GB downloaded per month, and 100 simultaneous connections. Two people stay inside this easily. Large photo data URLs count toward the 1 GB, so prefer image links for big pictures. The app compresses an uploaded photo to a JPEG under roughly 150,000 characters.
+- Firebase Spark: email/password auth, 1 GB Realtime Database storage, about 10 GB downloaded per month, and 100 simultaneous connections. Two people stay inside this easily. Photos count toward the 1 GB, so the app compresses each one to a JPEG before saving. A profile photo is kept smaller than a memory photo.
 - Firebase Storage is not used, so there is no storage billing.
 - OpenStreetMap tiles and Open-Meteo weather are free and need no key. Be gentle with them; the map loads tiles as you pan, and weather is requested when a pin exists.
 - Vercel hobby and GitHub Pages are enough. No App Store or Play Store.
