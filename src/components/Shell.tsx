@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { BookHeart, Heart, House, MapPin, Settings, Sparkles } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { LanguageToggle } from './LanguageToggle.tsx'
+import { PartnerNotices } from './PartnerNotices.tsx'
 import { useI18n } from '../i18n/LocaleContext.tsx'
 import { cx } from '../lib/format.ts'
 import type { MessageKey } from '../i18n/messages.ts'
@@ -86,6 +87,7 @@ export function Shell() {
           </div>
         </header>
         <OfflineBanner />
+        <PartnerNotices />
         <main id="main" className="app-main">
           <motion.div
             key={location.pathname}

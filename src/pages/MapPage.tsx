@@ -55,6 +55,7 @@ export function MapPage() {
     }).addTo(map)
     mapRef.current = map
     pinsRef.current = L.layerGroup().addTo(map)
+    window.setTimeout(() => map.invalidateSize(), 60)
     return () => {
       map.remove()
       mapRef.current = null
@@ -75,11 +76,15 @@ export function MapPage() {
         iconSize: [36, 36],
         iconAnchor: [18, 18],
       })
-      L.marker([pin.lat, pin.lng], { icon, title: pin.name }).addTo(group)
+      L.marker([pin.lat, pin.lng], { icon, title: pin.name }).bindPopup(escapeHtml(pin.name)).addTo(group)
       bounds.push([pin.lat, pin.lng])
     })
-    if (bounds.length === 1) map.setView(bounds[0], 11)
-    else if (bounds.length > 1) map.fitBounds(L.latLngBounds(bounds), { padding: [36, 36] })
+    if (bounds.length === 1) map.setView(bounds[0], 13)
+    else if (bounds.length > 1) {
+      L.polyline(bounds, { color: '#ff79a8', weight: 3, opacity: 0.85 }).addTo(group)
+      map.fitBounds(L.latLngBounds(bounds), { padding: [42, 42], maxZoom: 13 })
+    }
+    window.setTimeout(() => map.invalidateSize(), 60)
   }, [pinKey, pins])
 
   useEffect(() => {
@@ -142,7 +147,9 @@ export function MapPage() {
   return (
     <div className="grid gap-4">
       <PageTitle title={t('map.title')} />
-      <div ref={host} className="map-frame" role="region" aria-label={t('map.region')} />
+      <div className="map-frame" role="region" aria-label={t('map.region')}>
+        <div ref={host} className="h-full w-full" />
+      </div>
       <p className="fine-print">{t('map.credit')}</p>
       {distance ? <Card className="p-4"><p className="font-display text-3xl">{distance}</p></Card> : <p className="text-sm text-[var(--muted)]">{t('map.distanceWait')}</p>}
       <div className="grid gap-2 sm:grid-cols-2">
@@ -198,7 +205,7 @@ function PinSummary({
       <p className="font-extrabold">{name}</p>
       {location ? (
         <>
-          <p className="text-sm text-[var(--muted)]">{t('map.lastShared', { when: formatWhen(location.updatedAt, locale), lat: location.lat.toFixed(2), lng: location.lng.toFixed(2) })}</p>
+          <p className="text-sm text-[var(--muted)]">{t('map.lastShared', { when: formatWhen(location.updatedAt, locale) })}</p>
           <p className="text-sm">{time ? t('map.localTime', { time }) : t('map.localWait')}{forecast ? ` · ${phrase(forecast.label)}, ${Math.round(forecast.temp)}°` : ''}</p>
         </>
       ) : (

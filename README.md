@@ -14,7 +14,7 @@ Each person can use English or Bahasa Malaysia. That choice changes only their s
 
 ## What it does
 
-- Signs each person in with email and password, then pairs exactly two accounts with an 8-character invitation code.
+- Starts each person with their name, then pairs exactly two accounts with an 8-character invitation code.
 - Shows both names, time together, a meeting countdown, moods, and a daily love note on Home.
 - Lets the couple swipe This or That cards, spin a wheel, and flip a coin, then keeps the shared result.
 - Holds date ideas and a checklist both people can add, schedule, favourite, and tick off.
@@ -73,13 +73,13 @@ npm run preview
 ## Architecture and data flow
 
 1. The phone opens the web app. Hash routes such as `/#/together` load the matching screen.
-2. Firebase Authentication signs the person in. The password is never written to the database.
+2. Firebase Authentication signs the person in from their name. A password is never written to the database.
 3. Creating a space writes the owner and an invitation. Joining sets the partner in a transaction, and only when the seat is empty.
 4. The app listens to `couples/{id}`. A note, vote, checklist tick, memory, or pin from one phone updates the other phone.
 5. Profile photos and memory photos are compressed in the browser, then saved as small images on that same couple record.
 6. Our Map asks for GPS only after Ping my spot. OpenStreetMap draws the pins. Open-Meteo adds weather for those coordinates.
 
-The database root is closed. A person can read a couple only if they are the owner or the partner. Invitation codes cannot be listed. The optional PIN locks the screen on that phone. The email login is the real lock.
+The database root is closed. A person can read a couple only if they are the owner or the partner. Invitation codes cannot be listed. The optional PIN locks the screen on that phone. The signed-in session is the real lock.
 
 ## Live demo
 

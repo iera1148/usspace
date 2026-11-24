@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { isFirebaseConfigured } from '../lib/firebase.ts'
 import { assertEmail, assertName, assertPassword, assertPin } from '../lib/format.ts'
 import { hashSecret, randomSalt } from '../lib/hash.ts'
-import { logIn, logOut, saveUser, sendReset, signUp, watchAuth, watchUser } from '../services/repository.ts'
+import { logIn, logOut, saveUser, sendReset, signUp, signUpWithName, watchAuth, watchUser } from '../services/repository.ts'
 import type { SessionUser, ThemeId, UserProfile } from '../types.ts'
 
 interface AuthValue {
@@ -13,6 +13,7 @@ interface AuthValue {
   session: SessionUser | null
   profile: UserProfile | null
   signUpAccount: (email: string, password: string, displayName: string) => Promise<void>
+  startWithName: (displayName: string) => Promise<void>
   logInAccount: (email: string, password: string) => Promise<void>
   logOutAccount: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
@@ -70,6 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile,
       async signUpAccount(email, password, displayName) {
         await signUp(assertEmail(email), assertPassword(password), assertName(displayName))
+      },
+      async startWithName(displayName) {
+        await signUpWithName(assertName(displayName))
       },
       async logInAccount(email, password) {
         await logIn(assertEmail(email), assertPassword(password))

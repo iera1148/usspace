@@ -6,21 +6,20 @@ import { useAuth } from '../context/AuthContext.tsx'
 import { useI18n } from '../i18n/LocaleContext.tsx'
 
 export function SignupPage() {
-  const { signUpAccount } = useAuth()
+  const { startWithName } = useAuth()
   const { t, err } = useI18n()
   const navigate = useNavigate()
   const [displayName, setDisplayName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') void Notification.requestPermission()
     setBusy(true)
     setError('')
     try {
-      await signUpAccount(email, password, displayName)
+      await startWithName(displayName)
       navigate('/connect')
     } catch (reason) {
       setError(err(reason))
@@ -39,12 +38,9 @@ export function SignupPage() {
           </div>
           <LanguageToggle />
         </div>
-        <Field label={t('auth.name')} name="name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} autoComplete="nickname" required />
-        <Field label={t('auth.email')} name="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required />
-        <Field label={t('auth.password')} name="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" minLength={6} required hint={t('auth.passwordHint')} />
+        <Field label={t('auth.name')} name="name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} autoComplete="nickname" maxLength={32} required />
         <ErrorNote>{error}</ErrorNote>
         <Button type="submit" disabled={busy}>{busy ? t('auth.creating') : t('auth.continue')}</Button>
-        <Link className="text-center text-sm font-extrabold" to="/login">{t('auth.haveAccount')}</Link>
       </form>
     </div>
   )

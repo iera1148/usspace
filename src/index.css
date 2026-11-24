@@ -254,6 +254,7 @@ img { max-width: 100%; }
 }
 .pill { padding: 0.3rem 0.7rem; }
 .banner { margin: 0 1rem 0.5rem; padding: 0.55rem 0.8rem; border-radius: 1rem; }
+.alert-banner { display: block; width: calc(100% - 2rem); border: 0; text-align: center; cursor: pointer; }
 
 .auth-screen {
   display: flex;
@@ -355,7 +356,7 @@ img { max-width: 100%; }
   font-weight: 800;
 }
 .timeline { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
-.map-frame { height: 340px; overflow: hidden; border-radius: 1.5rem; border: 1px solid var(--line); }
+.map-frame { height: clamp(320px, 48vh, 440px); overflow: hidden; border-radius: 1.5rem; border: 1px solid var(--line); }
 .map-pin {
   display: grid;
   place-items: center;
@@ -365,7 +366,7 @@ img { max-width: 100%; }
   font-weight: 800;
   border: 2px solid white !important;
 }
-.leaflet-container { font-family: inherit; height: 100%; background: var(--soft); }
+.map-frame .leaflet-container { font-family: inherit; height: 100%; background: var(--soft); }
 
 .heart-loader {
   font-family: Fraunces, Georgia, serif;

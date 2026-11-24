@@ -3,6 +3,7 @@ import {
   deleteUser,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  signInAnonymously,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
@@ -452,6 +453,49 @@ export function listenCouple(
     (snap) => onData(snap.exists() ? normalizeCouple(snap.val()) : null),
     (error) => onError(error),
   )
+}
+
+export async function signUpWithName(displayName: string) {
+  if (!isFirebaseConfigured) {
+    const db = loadDb()
+    const uid = createId()
+    const passwordSalt = randomSalt()
+    db.users[uid] = {
+      displayName,
+      email: '',
+      photoURL: '',
+      theme: 'pink',
+      darkMode: false,
+      locationSharing: true,
+      language: storedLanguage(),
+      passwordHash: passwordSalt,
+      passwordSalt,
+    }
+    writeSession(uid)
+    saveDb(db)
+    return uid
+  }
+  let user
+  try {
+    user = (await signInAnonymously(getFirebaseAuth())).user
+  } catch (error) {
+    const code = typeof error === 'object' && error && 'code' in error ? String(error.code) : ''
+    if (code !== 'auth/operation-not-allowed' && code !== 'auth/admin-restricted-operation') throw error
+    const email = `guest.${createId().toLowerCase()}@users.usspace.app`
+    const password = `${randomSalt()}Aa1`
+    user = (await createUserWithEmailAndPassword(getFirebaseAuth(), email, password)).user
+  }
+  await updateProfile(user, { displayName })
+  await set(ref(getFirebaseDb(), `users/${user.uid}`), {
+    displayName,
+    email: user.email ?? '',
+    photoURL: '',
+    theme: 'pink',
+    darkMode: false,
+    locationSharing: true,
+    language: storedLanguage(),
+  })
+  return user.uid
 }
 
 export async function signUp(email: string, password: string, displayName: string) {

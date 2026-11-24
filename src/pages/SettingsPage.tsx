@@ -179,7 +179,7 @@ export function SettingsPage() {
           <input type="checkbox" checked={profile?.locationSharing !== false} onChange={(event) => void savePreferences({ locationSharing: event.target.checked }).then(() => { if (!event.target.checked) return removeMyLocation() })} />
           {t('settings.allowLocation')}
         </label>
-        <p className="text-sm text-[var(--muted)]">{t('settings.signedIn', { email: session?.email ?? '' })}</p>
+        {session?.email && !session.email.endsWith('@users.usspace.app') ? <p className="text-sm text-[var(--muted)]">{t('settings.signedIn', { email: session.email })}</p> : null}
         <Button variant="ghost" onClick={() => void logOutAccount().then(() => navigate('/welcome'))}>{t('settings.logout')}</Button>
         <Button variant="danger" onClick={() => setDialog('leave')}>{t('settings.leave')}</Button>
         <Button variant="danger" onClick={() => setDialog('delete')}>{t('settings.delete')}</Button>
